@@ -155,6 +155,21 @@ const register = async (req, res) => {
 const login = async (req, res, next) => {
   console.log("login function");
 
+  // add macAddress for verifyAccessToken in middleware
+  let macAddressRegex = new RegExp(
+    /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})|([0-9a-fA-F]{4}.[0-9a-fA-F]{4}.[0-9a-fA-F]{4})$/
+  );
+
+  if (!req.headers["mac-address"])
+    return res
+      .status(401)
+      .send({ status: "error", message: "MAC address is required!" });
+
+  if (macAddressRegex.test(req.headers["mac-address"]) === false)
+    return res
+      .status(401)
+      .send({ status: "error", message: "MAC address is invalid!" });
+
   if (!req.headers["device-fingerprint"]) {
     return res
       .status(401)
@@ -188,7 +203,7 @@ const login = async (req, res, next) => {
         }
 
         const foundUserEmail = foundUser.user.email;
-        const foundUserId = foundUser.userId;
+        const foundUserId = foundUser._id;
 
         const accessToken = jwt.sign(
           {
@@ -214,6 +229,11 @@ const login = async (req, res, next) => {
           `Device_Fingerprint_${foundUserId}`,
           deviceFingerprint
         );
+        await redis.sAdd(
+          `Mac_Address_${foundUserId}`,
+          req.headers["mac-address"]
+        );
+        await redis.sAdd(`Hardware_ID_${foundUserId}`, deviceFingerprint);
 
         redis.set(`Last_Login_${foundUserId}_${deviceFingerprint}`, Date.now());
 
@@ -570,7 +590,6 @@ const googleFlutterLogin = async (req, res) => {
           });
         }
       } else {
-        
         let userType = req.body.userType ? req.body.userType : "regular";
         let userData = req.body.userData ? req.body.userData : {};
 
@@ -585,7 +604,6 @@ const googleFlutterLogin = async (req, res) => {
         }
         userDataDocument.save(); // บันทึก userData
 
-        
         new user({
           user: {
             name: payload["name"],
