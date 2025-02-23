@@ -1,0 +1,714 @@
+{
+	"info": {
+		"_postman_id": "e8dc4435-c63c-484f-9eb0-3500b0d0f9d1",
+		"name": "Healwold",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "23050179"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "businessId",
+								"value": "{{businessid}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"{{name}}\",\r\n    \"email\": \"{{email}}\",\r\n    \"password\": \"{{password}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/auth/register",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "verify email",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/accounts/verify/email?email={{email}}&ref={{ref}}&token={{token}}",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"accounts",
+								"verify",
+								"email"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "{{email}}"
+								},
+								{
+									"key": "ref",
+									"value": "{{ref}}"
+								},
+								{
+									"key": "token",
+									"value": "{{token}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let response = pm.response.json();\r",
+									"\r",
+									"if (response.data.tokens) {\r",
+									"    pm.environment.set(\"access_token\", response.data.tokens.accessToken);\r",
+									"    pm.environment.set(\"refresh_token\", response.data.tokens.refreshToken);\r",
+									"\r",
+									"    console.log(\"access token set:\", response.data.tokens.accessToken);\r",
+									"    console.log(\"refresh token set:\", response.data.tokens.refreshToken);\r",
+									"} else {\r",
+									"    console.log(\"Failed to extract access token\");1\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "device-fingerprint",
+								"value": "{{device-fingerprint}}",
+								"type": "text"
+							},
+							{
+								"key": "businessid",
+								"value": "{{businessid}}",
+								"type": "text"
+							},
+							{
+								"key": "mac-address",
+								"value": "{{mac-address}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"email\": \"{{email}}\",\r\n  \"password\": \"{{password}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/auth/login",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "refresh",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let response = pm.response.json();\r",
+									"\r",
+									"if (response.data.tokens) {\r",
+									"    pm.environment.set(\"access_token\", response.data.tokens.accessToken);\r",
+									"\r",
+									"    console.log(\"access token set:\", response.data.tokens.accessToken);\r",
+									"} else {\r",
+									"    console.log(\"Failed to extract access token\");1\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{refresh_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "hardware-id",
+								"value": "{{device-fingerprint}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/auth/refresh",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Product",
+			"item": [
+				{
+					"name": "create product",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "mac-address",
+								"value": "{{mac-address}}",
+								"type": "text"
+							},
+							{
+								"key": "hardware-id",
+								"value": "{{device-fingerprint}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"straw\",\r\n    \"price\": 20,\r\n    \"stock\": 20\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/product",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"product"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/product",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"product"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get productById",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/product/67ba8a3041051f092c888b0a",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"product",
+								"67ba8a3041051f092c888b0a"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update productById",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "mac-address",
+								"value": "{{mac-address}}",
+								"type": "text"
+							},
+							{
+								"key": "hardware-id",
+								"value": "{{device-fingerprint}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"banana\",\r\n    \"price\": 30,\r\n    \"stock\": 20\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/product/67bad7e6b7c49a01c32ef99b",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"product",
+								"67bad7e6b7c49a01c32ef99b"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete productById",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "mac-address",
+								"value": "{{mac-address}}",
+								"type": "text"
+							},
+							{
+								"key": "hardware-id",
+								"value": "{{device-fingerprint}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/product/67bad7e6b7c49a01c32ef99b",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"product",
+								"67bad7e6b7c49a01c32ef99b"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Order",
+			"item": [
+				{
+					"name": "create order",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "mac-address",
+								"value": "{{mac-address}}",
+								"type": "text"
+							},
+							{
+								"key": "hardware-id",
+								"value": "{{device-fingerprint}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"products\": [\r\n        {\r\n            \"productId\": \"67ba8a3041051f092c888b0a\",\r\n            \"quantity\": 2\r\n        },\r\n        {\r\n            \"productId\": \"67ba911641051f092c888b13\",\r\n            \"quantity\": 2\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/order",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"order"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all orders",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "mac-address",
+								"value": "{{mac-address}}",
+								"type": "text"
+							},
+							{
+								"key": "hardware-id",
+								"value": "{{device-fingerprint}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/order",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"order"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get orderById",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "mac-address",
+								"value": "{{mac-address}}",
+								"type": "text"
+							},
+							{
+								"key": "hardware-id",
+								"value": "{{device-fingerprint}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/order/67bab2fdb239a5a6a34b7ecf",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"order",
+								"67bab2fdb239a5a6a34b7ecf"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get ordersByUserId",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "mac-address",
+								"value": "{{mac-address}}",
+								"type": "text"
+							},
+							{
+								"key": "hardware-id",
+								"value": "{{device-fingerprint}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/order/getOrdersByUserId/67ba88720eb9e143b37eed19",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"order",
+								"getOrdersByUserId",
+								"67ba88720eb9e143b37eed19"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update orderById",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "mac-address",
+								"value": "{{mac-address}}",
+								"type": "text"
+							},
+							{
+								"key": "hardware-id",
+								"value": "{{device-fingerprint}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"products\": [\r\n        {\r\n            \"product\": \"67ba8a3041051f092c888b0a\",\r\n            \"quantity\": 5,\r\n            \"price\": 20\r\n        },\r\n        {\r\n            \"product\": \"67ba911641051f092c888b13\",\r\n            \"quantity\": 2,\r\n            \"price\": 30\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/order/67bab2fdb239a5a6a34b7ecf",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"order",
+								"67bab2fdb239a5a6a34b7ecf"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete orderById",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "mac-address",
+								"value": "{{mac-address}}",
+								"type": "text"
+							},
+							{
+								"key": "hardware-id",
+								"value": "{{device-fingerprint}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/order/67bab2fdb239a5a6a34b7ecf",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"order",
+								"67bab2fdb239a5a6a34b7ecf"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete restockThenDeleteOrdersById",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "mac-address",
+								"value": "{{mac-address}}",
+								"type": "text"
+							},
+							{
+								"key": "hardware-id",
+								"value": "{{device-fingerprint}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{URL}}/order/restockThenDelete/67bac948d456576932798f4b",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"order",
+								"restockThenDelete",
+								"67bac948d456576932798f4b"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
