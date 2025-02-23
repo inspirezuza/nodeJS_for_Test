@@ -1,13 +1,19 @@
 // const Product = require("../schemas/v1/product.schema.js");
 
-const Product = require("../schemas/v1/product.Schema");
+const Product = require("../schemas/v1/product.schema");
+// const Product = require("../schemas/v1/product.schema");
 
 exports.createProduct = async (req, res) => {
   try {
     const { name, price, stock } = req.body;
     const createdBy = req.user.userId;
 
-    const product = await Product.create({ name, price, stock, createdBy });
+    const product = await Product.create({
+      name,
+      price,
+      stock,
+      createdBy,
+    });
 
     res.status(201).json(product);
   } catch (error) {
